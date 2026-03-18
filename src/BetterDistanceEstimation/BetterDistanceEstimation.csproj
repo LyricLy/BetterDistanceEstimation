@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>com.github.LyricLy.BetterDistanceEstimation</AssemblyName>
+    <AssemblyTitle>BetterDistanceEstimation</AssemblyTitle>
+    <Version>0.1.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <DeployModFiles Include="$(TargetPath)" BepInExDir="plugins/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MonoDetour.HookGen" Version="0.7.*" PrivateAssets="all" />
+    <PackageReference Include="MonoDetour" Version="[*,2.0)" />
+  </ItemGroup>
+</Project>
