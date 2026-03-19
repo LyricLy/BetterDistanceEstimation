@@ -66,8 +66,9 @@ public struct LyricLyFirstGroundHitDistancesJob : IJobParallelFor
         var perp = new float2(-this.flagPosition.z, this.flagPosition.x);
         float denominator = perp.y * angle.x - perp.x * angle.y;
         float ledgeX = (perp.y * midpoint.x - perp.x * midpoint.y) / denominator;
+        float Floor() => ledgeX > 0 && simPos.x > ledgeX ? us.flagPosition.y : 0;
 
-        while (lastPos.y <= simPos.y || simPos.y > (simPos.x > ledgeX ? this.flagPosition.y : 0))
+        while (lastPos.y <= simPos.y || simPos.y > Floor())
         {
             v += gravity * us.deltaTime;
             v *= math.max(0f, 1f - us.airDragCoefficient * math.lengthsq(v) * us.deltaTime);
@@ -75,7 +76,7 @@ public struct LyricLyFirstGroundHitDistancesJob : IJobParallelFor
             simPos += v * us.deltaTime;
         }
 
-        float finalX = lastPos.x <= ledgeX && simPos.x > ledgeX ? ledgeX : math.lerp(lastPos.x, simPos.x, BMath.InverseLerp(lastPos.y, simPos.y, simPos.x > ledgeX ? this.flagPosition.y : 0));
+        float finalX = lastPos.x <= ledgeX && simPos.y > ledgeX ? ledgeX : math.lerp(lastPos.x, simPos.x, BMath.InverseLerp(lastPos.y, simPos.y, Floor()));
         float2 endPos = this.initialWorldPosition2d + finalX * angle;
 
         int2 spatialHash = TerrainManager.GetSpatialHash(endPos, this.terrainSize);

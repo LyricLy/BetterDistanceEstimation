@@ -8,5 +8,8 @@ It's a small change: when the player and flag are at different heights, the heig
 
 ## Changelog
 
+### 0.2.1
+Fix bugginess from last update if you point away from the flag
+
 ### 0.2.0
 Fix inaccuracy near the cliff between the player and flag that created visible seam lines
