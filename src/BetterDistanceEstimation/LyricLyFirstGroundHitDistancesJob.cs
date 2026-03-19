@@ -61,45 +61,22 @@ public struct LyricLyFirstGroundHitDistancesJob : IJobParallelFor
         var gravity = new float2(0f, this.verticalGravity);
         var lastPos = Vector2.zero;
         var simPos = float2.zero;
-        float lastMove = 0;
 
-        void Move(float stopAt)
+        float2 midpoint = this.flagPosition.xz / 2;
+        var perp = new float2(-this.flagPosition.z, this.flagPosition.x);
+        float denominator = perp.y * angle.x - perp.x * angle.y;
+        float ledgeX = (perp.y * midpoint.x - perp.x * midpoint.y) / denominator;
+
+        while (lastPos.y <= simPos.y || simPos.y > (simPos.x > ledgeX ? this.flagPosition.y : 0))
         {
-            lastMove = stopAt;
-            while (lastPos.y <= simPos.y || simPos.y > stopAt)
-            {
-                v += gravity * us.deltaTime;
-                v *= math.max(0f, 1f - us.airDragCoefficient * math.lengthsq(v) * us.deltaTime);
-                lastPos = simPos;
-                simPos += v * us.deltaTime;
-            }
+            v += gravity * us.deltaTime;
+            v *= math.max(0f, 1f - us.airDragCoefficient * math.lengthsq(v) * us.deltaTime);
+            lastPos = simPos;
+            simPos += v * us.deltaTime;
         }
 
-        bool CloserToFlag()
-        {
-            var here = simPos.x * angle;
-            return math.lengthsq(here) > math.lengthsq(us.flagPosition.xz - here);
-        }
-
-        if (this.flagPosition.y > 0)
-        {
-            Move(this.flagPosition.y);
-            if (!CloserToFlag())
-            {
-                Move(0);
-            }
-        }
-        else
-        {
-            Move(0);
-            if (CloserToFlag())
-            {
-                Move(this.flagPosition.y);
-            }
-        }
-
-        float2 endPos = this.initialWorldPosition2d + simPos.x * angle;
-        float flagX = math.lerp(lastPos.x, simPos.x, BMath.InverseLerp(lastPos.y, simPos.y, lastMove));
+        float finalX = lastPos.x <= ledgeX && simPos.x > ledgeX ? ledgeX : math.lerp(lastPos.x, simPos.x, BMath.InverseLerp(lastPos.y, simPos.y, simPos.x > ledgeX ? this.flagPosition.y : 0));
+        float2 endPos = this.initialWorldPosition2d + finalX * angle;
 
         int2 spatialHash = TerrainManager.GetSpatialHash(endPos, this.terrainSize);
         var terrainLayer = (TerrainLayer)(-1);
@@ -129,6 +106,6 @@ public struct LyricLyFirstGroundHitDistancesJob : IJobParallelFor
             }
         }
 
-        this.estimatedDistances[initialSpeedIndex] = new PlayerGolfer.SwingDistanceEstimation(flagX, terrainLayer, outOfBoundsHazard);
+        this.estimatedDistances[initialSpeedIndex] = new PlayerGolfer.SwingDistanceEstimation(finalX, terrainLayer, outOfBoundsHazard);
     }
 }
