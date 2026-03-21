@@ -1,4 +1,4 @@
-﻿using BepInEx;
+using BepInEx;
 using MonoDetour;
 using MonoDetour.Cil;
 using MonoDetour.HookGen;

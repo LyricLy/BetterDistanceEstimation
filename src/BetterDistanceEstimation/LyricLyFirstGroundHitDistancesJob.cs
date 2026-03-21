@@ -1,4 +1,4 @@
-﻿using Brimstone.BallDistanceJobs;
+using Brimstone.BallDistanceJobs;
 using System;
 using Unity.Burst;
 using Unity.Collections;
