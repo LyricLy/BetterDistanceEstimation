@@ -55,7 +55,7 @@ public struct LyricLyFirstGroundHitDistancesJob : IJobParallelFor
 
         float speed = this.normalizedInitialSpeeds[initialSpeedIndex] * this.fullInitialSpeed;
         math.sincos(this.pitchRad, out float v1, out float v2);
-        var v = new float2(v1, v2) * speed;
+        var v = new float2(v2, v1) * speed;
 
         var us = this;
         var gravity = new float2(0f, this.verticalGravity);
@@ -76,7 +76,7 @@ public struct LyricLyFirstGroundHitDistancesJob : IJobParallelFor
             simPos += v * us.deltaTime;
         }
 
-        float finalX = lastPos.x <= ledgeX && simPos.y > ledgeX ? ledgeX : math.lerp(lastPos.x, simPos.x, BMath.InverseLerp(lastPos.y, simPos.y, Floor()));
+        float finalX = lastPos.x <= ledgeX && simPos.x > ledgeX ? ledgeX : math.lerp(lastPos.x, simPos.x, BMath.InverseLerp(lastPos.y, simPos.y, Floor()));
         float2 endPos = this.initialWorldPosition2d + finalX * angle;
 
         int2 spatialHash = TerrainManager.GetSpatialHash(endPos, this.terrainSize);

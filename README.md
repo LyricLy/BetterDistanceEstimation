@@ -8,6 +8,9 @@ It's a small change: when the player and flag are at different heights, the heig
 
 ## Changelog
 
+### 0.2.2
+Fix embarrassing calculation error that made it completely inaccurate...
+
 ### 0.2.1
 Fix bugginess from last update if you point away from the flag
 

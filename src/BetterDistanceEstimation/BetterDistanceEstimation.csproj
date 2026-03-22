@@ -3,7 +3,7 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <AssemblyName>com.github.LyricLy.BetterDistanceEstimation</AssemblyName>
     <AssemblyTitle>BetterDistanceEstimation</AssemblyTitle>
-    <Version>0.2.1</Version>
+    <Version>0.2.2</Version>
   </PropertyGroup>
 
   <ItemGroup>
