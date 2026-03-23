@@ -68,7 +68,7 @@ public struct LyricLyFirstGroundHitDistancesJob : IJobParallelFor
         float ledgeX = (perp.y * midpoint.x - perp.x * midpoint.y) / denominator;
         float Floor() => ledgeX > 0 && simPos.x > ledgeX ? us.flagPosition.y : 0;
 
-        while (lastPos.y <= simPos.y || simPos.y > Floor())
+        while (simPos.y >= Floor())
         {
             v += gravity * us.deltaTime;
             v *= math.max(0f, 1f - us.airDragCoefficient * math.lengthsq(v) * us.deltaTime);
