@@ -24,25 +24,17 @@ public class PlayerGolferHooks
     {
         ILWeaver w = new(info);
 
-        var start = w.MatchRelaxed(
-            x => x.MatchLdcI4(301) && w.SetCurrentTo(x),
-            x => x.MatchLdcI4(1),
-            x => x.MatchLdloca(9),
-            x => x.MatchInitobj(out _),
-            x => x.MatchLdloc(9),
-            x => x.MatchCall(((Func<CalculateFirstGroundHitDistancesJob, int, int, JobHandle, JobHandle>) IJobParallelForExtensions.Schedule).Method)
-        ).ThrowIfFailure().Current;
-
-        var end = w.MatchRelaxed(
-            x => x.MatchLdcI4(301),
+        Instruction start = null!;
+        w.MatchRelaxed(
+            x => x.MatchLdcI4(301) && w.SetInstructionTo(ref start, x),
             x => x.MatchLdcI4(1),
             x => x.MatchLdloca(9),
             x => x.MatchInitobj(out _),
             x => x.MatchLdloc(9),
             x => x.MatchCall(((Func<CalculateFirstGroundHitDistancesJob, int, int, JobHandle, JobHandle>) IJobParallelForExtensions.Schedule).Method) && w.SetCurrentTo(x)
-        ).ThrowIfFailure().Current;
+        ).ThrowIfFailure();
 
-        w.RemoveRangeAndShiftLabels(start, end);
+        w.RemoveRangeAndShiftLabels(start, w.Current);
         w.InsertBeforeCurrent(
             w.Create(OpCodes.Ldarg, 0),
             w.CreateDelegateCall((CalculateFirstGroundHitDistancesJob origJob, PlayerGolfer that) =>
