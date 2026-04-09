@@ -14,6 +14,7 @@ public struct LyricLyFirstGroundHitDistancesJob : IJobParallelFor
     public NativeArray<float> allTerrainLayerWeights;
     public NativeArray<float> allTerrainHeights;
     public NativeList<BoundsManager.SecondaryOutOfBoundsHazardInstance> secondaryOutOfBoundsHazards;
+    public NativeList<BoundsManager.LevelHazardInstance> levelHazards;
     public NativeArray<PlayerGolfer.SwingDistanceEstimation> estimatedDistances;
     public float mainOutOfBoundsHazardHeight;
     public OutOfBoundsHazard mainOutOfBoundsHazardType;
@@ -21,6 +22,7 @@ public struct LyricLyFirstGroundHitDistancesJob : IJobParallelFor
     public float2 initialWorldPosition2d;
     public float yawRad;
     public float fullInitialSpeed;
+    public float baseInitialSpeed;
     public float verticalGravity;
     public float pitchRad;
     public float airDragCoefficient;
@@ -35,12 +37,14 @@ public struct LyricLyFirstGroundHitDistancesJob : IJobParallelFor
         this.allTerrainLayerWeights = origJob.allTerrainLayerWeights;
         this.allTerrainHeights = origJob.allTerrainHeights;
         this.secondaryOutOfBoundsHazards = origJob.secondaryOutOfBoundsHazards;
+        this.levelHazards = origJob.levelHazards;
         this.estimatedDistances = origJob.estimatedDistances;
         this.mainOutOfBoundsHazardHeight = origJob.mainOutOfBoundsHazardHeight;
         this.terrainSize = origJob.terrainSize;
         this.initialWorldPosition2d = origJob.initialWorldPosition2d;
         this.yawRad = origJob.yawRad;
         this.fullInitialSpeed = origJob.fullInitialSpeed;
+        this.baseInitialSpeed = origJob.baseInitialSpeed;
         this.verticalGravity = origJob.verticalGravity;
         this.pitchRad = origJob.pitchRad;
         this.airDragCoefficient = origJob.airDragCoefficient;
@@ -81,32 +85,45 @@ public struct LyricLyFirstGroundHitDistancesJob : IJobParallelFor
 
         int2 spatialHash = TerrainManager.GetSpatialHash(endPos, this.terrainSize);
         var terrainLayer = (TerrainLayer)(-1);
+        var levelHazard = (LevelHazardType)(-1);
         var outOfBoundsHazard = (OutOfBoundsHazard)(-1);
 
         if (this.spatiallyHashedTerrains.TryGetValue(spatialHash, out var jobsTerrain))
         {
             float heightAt = jobsTerrain.GetHeightAt(endPos, this.allTerrainHeights);
-            BoundsJobHelper.IsInOutOfBoundsHazard(
-                new float3(endPos.x, heightAt, endPos.y),
-                this.secondaryOutOfBoundsHazards,
-                this.mainOutOfBoundsHazardHeight,
-                this.mainOutOfBoundsHazardType,
-                out _, out var outOfBoundsHazard2, out _
-            );
-            if (outOfBoundsHazard2 >= OutOfBoundsHazard.Water)
+            var point = new float3(endPos.x, heightAt, endPos.y);
+            if (BoundsJobHelper.IsInOrOverLevelHazard(
+                point,
+                levelHazards,
+                out bool isOverHazard, out _, out LevelHazardType hazardType, out _
+            ) && !isOverHazard)
             {
-                outOfBoundsHazard = outOfBoundsHazard2;
+                levelHazard = hazardType;
             }
             else
             {
-                int dominantLayerIndexAt = jobsTerrain.GetDominantLayerIndexAt(endPos, this.allTerrainLayerWeights);
-                if (this.globalTerrainLayerIndicesPerLevelTerrainLayer.TryGetValue(dominantLayerIndexAt, out var tl))
+                BoundsJobHelper.IsInOutOfBoundsHazard(
+                    point,
+                    this.secondaryOutOfBoundsHazards,
+                    this.mainOutOfBoundsHazardHeight,
+                    this.mainOutOfBoundsHazardType,
+                    out _, out var hazardType2, out _
+                );
+                if (hazardType2 >= OutOfBoundsHazard.Water)
                 {
-                    terrainLayer = (TerrainLayer)tl;
+                    outOfBoundsHazard = hazardType2;
+                }
+                else
+                {
+                    int dominantLayerIndexAt = jobsTerrain.GetDominantLayerIndexAt(endPos, this.allTerrainLayerWeights);
+                    if (this.globalTerrainLayerIndicesPerLevelTerrainLayer.TryGetValue(dominantLayerIndexAt, out var tl))
+                    {
+                        terrainLayer = (TerrainLayer)tl;
+                    }
                 }
             }
         }
 
-        this.estimatedDistances[initialSpeedIndex] = new PlayerGolfer.SwingDistanceEstimation(finalX, terrainLayer, outOfBoundsHazard);
+        this.estimatedDistances[initialSpeedIndex] = new PlayerGolfer.SwingDistanceEstimation(finalX, terrainLayer, levelHazard, outOfBoundsHazard);
     }
 }

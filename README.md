@@ -8,6 +8,9 @@ It's a small change: when the player and flag are at different heights, the heig
 
 ## Changelog
 
+### 0.2.4
+Compatibility with Frozen Fairway update
+
 ### 0.2.3
 Fix instances where low-angled shots broke the indicator when below the flag
 

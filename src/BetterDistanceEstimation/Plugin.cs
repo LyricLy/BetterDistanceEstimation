@@ -17,7 +17,7 @@ public class PlayerGolferHooks
     [MonoDetourHookInitialize]
     static void Init()
     {
-        Md.PlayerGolfer._OnBUpdate_g__UpdateHoleDistanceEstimationForOwnBall_153_4.ILHook(ILHook_CallOurJob);
+        Md.PlayerGolfer._OnBUpdate_g__UpdateHoleDistanceEstimationForOwnBall_176_4.ILHook(ILHook_CallOurJob);
     }
 
     static void ILHook_CallOurJob(ILManipulationInfo info)
@@ -28,9 +28,9 @@ public class PlayerGolferHooks
         w.MatchRelaxed(
             x => x.MatchLdcI4(301) && w.SetInstructionTo(ref start, x),
             x => x.MatchLdcI4(1),
-            x => x.MatchLdloca(9),
+            x => x.MatchLdloca(15),
             x => x.MatchInitobj(out _),
-            x => x.MatchLdloc(9),
+            x => x.MatchLdloc(15),
             x => x.MatchCall(((Func<CalculateFirstGroundHitDistancesJob, int, int, JobHandle, JobHandle>) IJobParallelForExtensions.Schedule).Method) && w.SetCurrentTo(x)
         ).ThrowIfFailure();
 
