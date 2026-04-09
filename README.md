@@ -8,6 +8,9 @@ It's a small change: when the player and flag are at different heights, the heig
 
 ## Changelog
 
+### 0.2.5
+Correct speed calculation with Rocket Driver
+
 ### 0.2.4
 Compatibility with Frozen Fairway update
 

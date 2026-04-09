@@ -57,7 +57,7 @@ public struct LyricLyFirstGroundHitDistancesJob : IJobParallelFor
         math.sincos(this.yawRad, out float angle1, out float angle2);
         var angle = new float2(angle1, angle2);
 
-        float speed = this.normalizedInitialSpeeds[initialSpeedIndex] * this.fullInitialSpeed;
+        float speed = this.normalizedInitialSpeeds[initialSpeedIndex] * (this.fullInitialSpeed - this.baseInitialSpeed);
         math.sincos(this.pitchRad, out float v1, out float v2);
         var v = new float2(v2, v1) * speed;
 
@@ -94,7 +94,7 @@ public struct LyricLyFirstGroundHitDistancesJob : IJobParallelFor
             var point = new float3(endPos.x, heightAt, endPos.y);
             if (BoundsJobHelper.IsInOrOverLevelHazard(
                 point,
-                levelHazards,
+                this.levelHazards,
                 out bool isOverHazard, out _, out LevelHazardType hazardType, out _
             ) && !isOverHazard)
             {
