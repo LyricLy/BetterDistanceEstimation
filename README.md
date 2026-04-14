@@ -8,6 +8,9 @@ It's a small change: when the player and flag are at different heights, the heig
 
 ## Changelog
 
+### 0.2.6
+*Actually* correct speed calculation with Rocket Driver
+
 ### 0.2.5
 Correct speed calculation with Rocket Driver
 

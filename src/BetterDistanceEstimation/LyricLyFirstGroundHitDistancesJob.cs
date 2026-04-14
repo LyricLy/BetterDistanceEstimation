@@ -57,7 +57,7 @@ public struct LyricLyFirstGroundHitDistancesJob : IJobParallelFor
         math.sincos(this.yawRad, out float angle1, out float angle2);
         var angle = new float2(angle1, angle2);
 
-        float speed = this.normalizedInitialSpeeds[initialSpeedIndex] * (this.fullInitialSpeed - this.baseInitialSpeed);
+        float speed = this.baseInitialSpeed + this.normalizedInitialSpeeds[initialSpeedIndex] * (this.fullInitialSpeed - this.baseInitialSpeed);
         math.sincos(this.pitchRad, out float v1, out float v2);
         var v = new float2(v2, v1) * speed;
 
